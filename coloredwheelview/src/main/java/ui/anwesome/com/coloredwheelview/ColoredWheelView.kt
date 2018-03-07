@@ -21,7 +21,7 @@ class ColoredWheelView(ctx : Context) : View(ctx) {
         return true
     }
     data class State(var prevScale : Float = 0f, var dir : Float = 0f, var jDir : Int = 1, var j : Int = 0) {
-        val scales : Array<Float> = arrayOf(0f, 0f, 0f)
+        val scales : Array<Float> = arrayOf(0f, 0f)
         fun update(stopcb : (Float) -> Unit) {
             scales[j] += jDir * 0.1f
             if(Math.abs(scales[j] - prevScale) > 1) {
@@ -68,4 +68,49 @@ class ColoredWheelView(ctx : Context) : View(ctx) {
             }
         }
     }
+    data class ColoredWheel(var i : Int, var n: Int, var state : State = State()) {
+        fun draw(canvas : Canvas, paint : Paint) {
+            val w = canvas.width.toFloat()
+            val h = canvas.height.toFloat()
+            val r = Math.min(w, h)/10
+            val x = w/2
+            if(n > 0) {
+                for (i in 0..1) {
+                    val mx = r + i * (w - 2 * r)
+                    canvas.save()
+                    canvas.translate(x + (mx - x) * state.scales[1], h / 2)
+                    canvas.rotate(360f * state.scales[0])
+                    val deg = 360f / n
+                    for (j in 0..n - 1) {
+                        canvas.drawAngleArc(0f, 0f, r, deg * j, deg, Color.parseColor(colors[j%colors.size]), paint)
+                    }
+                    canvas.restore()
+                }
+            }
+        }
+        fun update(stopcb : (Float) -> Unit) {
+            state.update(stopcb)
+        }
+        fun startUpdating(startcb : () -> Unit) {
+            state.startUpdating(startcb)
+        }
+    }
+}
+fun Canvas.drawAngleArc(x : Float, y : Float, r : Float, start : Float, sweep : Float,  color : Int, paint : Paint) {
+    paint.color = color
+    val path : Path = Path()
+    paint.style = Paint.Style.STROKE
+    paint.strokeWidth = r/8
+    paint.strokeCap = Paint.Cap.ROUND
+    for(i in start.toInt()..(start+sweep).toInt()) {
+        val rx = x + r * Math.cos(i * Math.PI/180).toFloat()
+        val ry = y + r * Math.sin(i * Math.PI/180).toFloat()
+        if(i == start.toInt()) {
+            path.moveTo(rx, ry)
+        }
+        else {
+            path.lineTo(rx, ry)
+        }
+    }
+    drawPath(path, paint)
 }
