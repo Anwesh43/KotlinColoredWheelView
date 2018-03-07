@@ -7,7 +7,7 @@ import android.view.*
 import android.content.*
 import android.graphics.*
 val colors : Array<String> = arrayOf("#f44336", "#4CAF50", "#3949AB", "#7B1FA2", "#880E4F", "#64DD17")
-class ColoredWheelView(ctx : Context) : View(ctx) {
+class ColoredWheelView(ctx : Context,var n : Int = 6) : View(ctx) {
     val paint = Paint(Paint.ANTI_ALIAS_FLAG)
     override fun onDraw(canvas : Canvas) {
 
@@ -82,7 +82,7 @@ class ColoredWheelView(ctx : Context) : View(ctx) {
                     canvas.rotate(360f * state.scales[0])
                     val deg = 360f / n
                     for (j in 0..n - 1) {
-                        canvas.drawAngleArc(0f, 0f, r, deg * j, deg, Color.parseColor(colors[j%colors.size]), paint)
+                        canvas.drawAngleArc(0f, 0f, r, deg * j, deg * state.scales[0], Color.parseColor(colors[j%colors.size]), paint)
                     }
                     canvas.restore()
                 }
@@ -93,6 +93,24 @@ class ColoredWheelView(ctx : Context) : View(ctx) {
         }
         fun startUpdating(startcb : () -> Unit) {
             state.startUpdating(startcb)
+        }
+    }
+    data class Renderer(var view : ColoredWheelView, var time : Int = 0) {
+        val wheel : ColoredWheel = ColoredWheel(0, view.n)
+        val animator : Animator = Animator(view)
+        fun render(canvas : Canvas, paint : Paint) {
+            canvas.drawColor(Color.parseColor("#212121"))
+            wheel.draw(canvas, paint)
+            animator.animate {
+                wheel.update {
+                    animator.stop()
+                }
+            }
+        }
+        fun handleTap() {
+            wheel.startUpdating {
+                animator.start()
+            }
         }
     }
 }
