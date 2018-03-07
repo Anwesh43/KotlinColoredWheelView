@@ -3,6 +3,7 @@ package ui.anwesome.com.coloredwheelview
 /**
  * Created by anweshmishra on 07/03/18.
  */
+import android.app.Activity
 import android.view.*
 import android.content.*
 import android.graphics.*
@@ -112,6 +113,13 @@ class ColoredWheelView(ctx : Context,var n : Int = 6) : View(ctx) {
             wheel.startUpdating {
                 animator.start()
             }
+        }
+    }
+    companion object {
+        fun create(activity : Activity) : ColoredWheelView {
+            val view = ColoredWheelView(activity)
+            activity.setContentView(view)
+            return view
         }
     }
 }
