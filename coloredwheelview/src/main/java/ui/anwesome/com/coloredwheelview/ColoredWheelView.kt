@@ -81,7 +81,7 @@ class ColoredWheelView(ctx : Context,var n : Int = 6) : View(ctx) {
                     val mx = r + i * (w - 2 * r)
                     canvas.save()
                     canvas.translate(x + (mx - x) * state.scales[1], h / 2)
-                    canvas.rotate(360f * state.scales[0])
+                    canvas.rotate(120f * state.scales[1])
                     val deg = 360f / n
                     for (j in 0..n - 1) {
                         canvas.drawAngleArc(0f, 0f, r, deg * j, deg * state.scales[0], Color.parseColor(colors[j%colors.size]), paint)
